@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zjh.sms.dao.Score.ScoreMapper" >
+    <resultMap id="BaseUserMap" type="com.zjh.sms.dto.Course" >
+        <result column="id" property="id" jdbcType="VARCHAR" />
+        <result column="name" property="name" jdbcType="VARCHAR" />
+        <result column="credits" property="credits" jdbcType="DECIMAL" />
+        <result column="number" property="number" jdbcType="INTEGER" />
+        <result column="score" property="score" jdbcType="INTEGER" />
+        <result column="year" property="year" jdbcType="INTEGER" />
+        <result column="term" property="term" jdbcType="INTEGER" />
+        <result column="grade" property="grade" jdbcType="VARCHAR" />
+        <result column="profession" property="profession" jdbcType="VARCHAR" />
+        <result column="type" property="type" jdbcType="INTEGER" />
+        <result column="profession" property="profession" jdbcType="VARCHAR" />
+        <result column="real_name" property="realName" jdbcType="VARCHAR" />
+        <result column="no" property="no" jdbcType="VARCHAR" />
+        <result column="student_id" property="studentId" jdbcType="VARCHAR" />
+        <result column="pointByUser" property="pointByUser" jdbcType="VARCHAR" />
+        <result column="creditsByUser" property="creditsByUser" jdbcType="VARCHAR" />
+        <result column="scoreByUser" property="scoreByUser" jdbcType="VARCHAR" />
+    </resultMap>
+    <select id="getCourseByMap" resultMap="BaseUserMap" parameterType="map">
+        SELECT
+            b.*,
+            c.real_name,
+            c.id as no,
+            c.grade,
+            c.username as student_name,
+            d.point as pointByUser,
+            d.credits as creditsByUser,
+            d.score as scoreByUser
+        FROM teacher_course a
+        LEFT JOIN course b
+        ON a.course_id = b.id
+        LEFT JOIN student c
+        ON a.profession = c.profession and a.grade = c.grade
+        LEFT JOIN student_course d
+        ON c.id = d.student_id and a.name = d.name
+        <where>
+            <if test="condition.profession != null and condition.profession != ''">
+                a.profession = #{condition.profession}
+            </if>
+            <if test="condition.grade != null and condition.grade != ''">
+                AND a.grade = #{condition.grade}
+            </if>
+            <if test="condition.username != null and condition.username != ''">
+                AND a.teacher_id = #{condition.username}
+            </if>
+            <if test="condition.courseName != null and condition.courseName != ''">
+                AND a.name = #{condition.courseName}
+            </if>
+            <if test="condition.studentName != null and condition.studentName != ''">
+                AND d.student_id = #{condition.studentName}
+            </if>
+        </where>
+        ORDER BY c.id
+    </select>
+    <select id="getExportListByAdmin" resultMap="BaseUserMap" parameterType="map">
+        select
+        a.id as no,
+        a.real_name,
+        a.admission_time as year,
+        a.grade,
+        a.profession,
+        b.name,
+        b.credits,
+        b.score,
+        b.number,
+        b.term,
+        b.type
+        FROM
+        student a
+        Left join course b
+        on a.profession = b.profession
+        <where>
+            <if test="condition.profession != null and condition.profession != ''">
+                a.profession = #{condition.profession}
+            </if>
+            <if test="condition.grade != null and condition.grade != ''">
+                AND a.grade = #{condition.grade}
+            </if>
+            <if test="condition.courseName != null and condition.courseName != ''">
+                AND b.name = #{condition.courseName}
+            </if>
+        </where>
+        order by a.id
+    </select>
+    <select id="getCourseByAdmin" resultMap="BaseUserMap" parameterType="map">
+        select
+            a.id as no,
+            a.real_name,
+            a.admission_time as year,
+            a.grade,
+            a.profession,
+            b.id,
+            b.name,
+            b.credits,
+            b.score,
+            b.number,
+            b.term,
+            b.type
+        FROM
+            student a
+        Left join course b
+        on a.profession = b.profession
+        <where>
+            <if test="condition.profession != null and condition.profession != ''">
+                a.profession = #{condition.profession}
+            </if>
+            <if test="condition.grade != null and condition.grade != ''">
+                AND a.grade = #{condition.grade}
+            </if>
+            <if test="condition.courseName != null and condition.courseName != ''">
+                AND b.name = #{condition.courseName}
+            </if>
+        </where>
+        order by a.id
+    </select>
+    <select id="getExportListByStudent" resultMap="BaseUserMap" parameterType="map">
+        SELECT
+            a.student_id AS NO,
+            a.point as pointByUser,
+            a.credits as creditsByUser,
+            a.score as scoreByUser,
+            b.real_name,
+            b.admission_time as year,
+            b.grade,
+            b.profession,
+            c.name,
+            c.credits,
+            c.score,
+            c.number,
+            c.term,
+            c.type
+        FROM
+            student_course a
+        LEFT JOIN student b ON a.student_id = b.id
+        LEFT JOIN course c on a.name = c.name
+        <where>
+            <if test="condition.studentName != null and condition.studentName != ''">
+                AND a.student_id = #{condition.studentName}
+            </if>
+            <if test="condition.year != null and condition.year != ''">
+                AND a.year = #{condition.year}
+            </if>
+            <if test="condition.term != null and condition.term != ''">
+                AND a.term = #{condition.term}
+            </if>
+        </where>
+        order by a.id
+    </select>
+    <select id="getCourseByStudent" resultMap="BaseUserMap" parameterType="map">
+        SELECT
+        a.student_id AS NO,
+        a.point as pointByUser,
+        a.credits as creditsByUser,
+        a.score as scoreByUser,
+        b.real_name,
+        b.admission_time as year,
+        b.grade,
+        b.profession,
+        c.name,
+        c.credits,
+        c.score,
+        c.number,
+        c.term,
+        c.type
+        FROM
+        student_course a
+        LEFT JOIN student b ON a.student_id = b.id
+        LEFT JOIN course c on a.name = c.name
+        <where>
+            <if test="condition.studentName != null and condition.studentName != ''">
+                AND a.student_id = #{condition.studentName}
+            </if>
+            <if test="condition.year != null and condition.year != ''">
+                AND a.year = #{condition.year}
+            </if>
+            <if test="condition.term != null and condition.term != ''">
+                AND a.term = #{condition.term}
+            </if>
+        </where>
+        order by a.id
+    </select>
+    <select id="getScoreById" resultMap="BaseUserMap" parameterType="map">
+        select
+            point as pointByUser,
+            credits as creditsByUser,
+            score as scoreByUser
+        FROM
+            student_course
+        <where>
+            <if test="condition.id != null and condition.id != ''">
+                student_id = #{condition.id}
+            </if>
+            <if test="condition.courseName != null and condition.courseName != ''">
+                AND name = #{condition.courseName}
+            </if>
+        </where>
+    </select>
+    <insert id="addEntry" parameterType="com.zjh.sms.dto.Score">
+        INSERT INTO student_course
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="no != null and no != ''">student_id,</if>
+            <if test="name != null and name != ''">`name`,</if>
+            <if test="creditsByUser != null and creditsByUser != ''">`credits`,</if>
+            <if test="pointByUser != null and pointByUser != ''">`point`,</if>
+            <if test="scoreByUser != null and scoreByUser != ''">`score`,</if>
+            <if test="year != null and year != ''">`year`,</if>
+            <if test="term != null and term != ''">term,</if>
+            <if test="courseId != null and courseId != ''">course_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="no != null and no != ''">#{no},</if>
+            <if test="name != null and name != ''">#{name},</if>
+            <if test="creditsByUser != null and creditsByUser != ''">#{creditsByUser},</if>
+            <if test="pointByUser != null and pointByUser != ''">#{pointByUser},</if>
+            <if test="scoreByUser != null and scoreByUser != ''">#{scoreByUser},</if>
+            <if test="year != null and year != ''">#{year},</if>
+            <if test="term != null and term != ''">#{term},</if>
+            <if test="courseId != null and courseId != ''">#{courseId},</if>
+        </trim>
+    </insert>
+    <update id="updateEntry" parameterType="com.zjh.sms.dto.Score">
+        UPDATE student_course
+        <trim prefix="set" suffixOverrides=",">
+            <if test="name != null and name != ''">
+                `name` = #{name},
+            </if>
+            <if test="creditsByUser != null and creditsByUser != ''">
+                credits = #{creditsByUser},
+            </if>
+            <if test="pointByUser != null and pointByUser != ''">
+                point = #{pointByUser},
+            </if>
+            <if test="scoreByUser != null and scoreByUser != ''">
+                score = #{scoreByUser},
+            </if>
+            <if test="year != null and year != ''">
+                `year`= #{year},
+            </if>
+            <if test="term != null and term != ''">
+                term = #{term},
+            </if>
+        </trim>
+        <where>
+            <if test="no != null and no != ''">
+                student_id = #{no}
+            </if>
+            <if test="name != null and name != ''">
+                AND `name` = #{name}
+            </if>
+        </where>
+    </update>
+    <select id="checkCount" resultType="int" parameterType="map">
+        select count(0) from student_course
+        <where>
+            student_id = #{condition.StudentId}
+            AND `name` = #{condition.CourseName}
+        </where>
+    </select>
+    <select id="getExportList" resultMap="BaseUserMap" parameterType="map">
+        SELECT
+        b.*,
+        c.real_name,
+        c.id as no,
+        c.grade,
+        c.username as student_name,
+        d.point as pointByUser,
+        d.credits as creditsByUser,
+        d.score as scoreByUser
+        FROM teacher_course a
+        LEFT JOIN course b
+        ON a.course_id = b.id
+        LEFT JOIN student c
+        ON a.profession = c.profession and a.grade = c.grade
+        LEFT JOIN student_course d
+        ON c.id = d.student_id  and a.name = d.name
+        <where>
+            <if test="condition.profession != null and condition.profession != ''">
+                a.profession = #{condition.profession}
+            </if>
+            <if test="condition.grade != null and condition.grade != ''">
+                AND a.grade = #{condition.grade}
+            </if>
+            <if test="condition.username != null and condition.username != ''">
+                AND a.teacher_id = #{condition.username}
+            </if>
+            <if test="condition.courseName != null and condition.courseName != ''">
+                AND a.name = #{condition.courseName}
+            </if>
+            <if test="condition.studentName != null and condition.studentName != ''">
+                AND d.student_id = #{condition.studentName}
+            </if>
+        </where>
+        ORDER BY c.id
+    </select>
+    <select id="getStudentTotal" resultMap="BaseUserMap" parameterType="map">
+        SELECT
+         credits as creditsByUser,
+         point as pointByUser
+        FROM student_course
+        <where>
+            <if test="condition.studentName != null and condition.studentName != ''">
+                AND student_id = #{condition.studentName}
+            </if>
+        </where>
+    </select>
+
+</mapper>
+
